@@ -11,6 +11,7 @@ import { Auth } from '../../services/auth';
   styleUrl: './register.css'
 })
 export class Register {
+  name = '';
   email = '';
   password = '';
   confirmPassword = '';
@@ -25,7 +26,7 @@ export class Register {
       return;
     }
 
-    this.authService.register(this.email, this.password).subscribe({
+    this.authService.register(this.name, this.email, this.password).subscribe({
       next: (response) => {
         this.success = 'Registration successful! Please login.';
         setTimeout(() => this.router.navigate(['/login']), 2000);

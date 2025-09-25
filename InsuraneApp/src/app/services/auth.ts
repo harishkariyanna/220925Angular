@@ -15,7 +15,11 @@ export class Auth {
     const token = localStorage.getItem('token');
     if (token) {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      this.currentUserSubject.next({ email: payload.email, role: payload.role });
+      this.currentUserSubject.next({ 
+        email: payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] || payload.email,
+        role: payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || payload.role,
+        name: payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || payload.name
+      });
     }
   }
 
@@ -23,12 +27,12 @@ export class Auth {
     return this.http.post(`${environment.apiUrl}/auth/login`, { email, password })
       .pipe(tap((response: any) => {
         localStorage.setItem('token', response.token);
-        this.currentUserSubject.next({ email: response.email, role: response.role });
+        this.currentUserSubject.next({ email: response.email, role: response.role, name: response.name });
       }));
   }
 
-  register(email: string, password: string): Observable<any> {
-    return this.http.post(`${environment.apiUrl}/auth/register`, { email, password });
+  register(name: string, email: string, password: string): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/auth/register`, { name, email, password });
   }
 
   logout(): void {
